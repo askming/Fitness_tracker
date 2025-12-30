@@ -24,10 +24,16 @@ export default function LogForm({ users, initialData }: { users: User[], initial
     const router = useRouter();
     const [loading, setLoading] = useState(false);
 
+    // Merge default activities with existing types from history
+    const uniqueActivities = Array.from(new Set([
+        ...ACTIVITIES.map(a => a.name),
+        ...(initialData?.existingTypes || [])
+    ])).map(name => ({ name }));
+
     // Init state based on initialData if present
-    const [selectedType, setSelectedType] = useState(initialData?.type && ACTIVITIES.find(a => a.name === initialData.type) ? initialData.type : ACTIVITIES[0].name);
-    const [customType, setCustomType] = useState(initialData?.type && !ACTIVITIES.find(a => a.name === initialData.type) ? initialData.type : '');
-    const [isCustom, setIsCustom] = useState(!!(initialData?.type && !ACTIVITIES.find(a => a.name === initialData.type)));
+    const [selectedType, setSelectedType] = useState(initialData?.type && uniqueActivities.find(a => a.name === initialData.type) ? initialData.type : uniqueActivities[0]?.name || 'Running');
+    const [customType, setCustomType] = useState(initialData?.type && !uniqueActivities.find(a => a.name === initialData.type) ? initialData.type : '');
+    const [isCustom, setIsCustom] = useState(!!(initialData?.type && !uniqueActivities.find(a => a.name === initialData.type)));
     const [notes, setNotes] = useState(initialData?.notes || ''); // Notes state
 
     // Default to first user if available
@@ -39,7 +45,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                 setSelectedUserId(initialData.userId);
             }
 
-            if (ACTIVITIES.find(a => a.name === initialData.type)) {
+            if (uniqueActivities.find(a => a.name === initialData.type)) {
                 setSelectedType(initialData.type);
                 setIsCustom(false);
             } else if (initialData.type) {
@@ -139,7 +145,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                 <div className="flex flex-col gap-4">
                     <label className="text-sm font-medium text-[var(--muted-foreground)]">Activity Type</label>
                     <div className="grid grid-cols-2 gap-3">
-                        {ACTIVITIES.map((activity) => {
+                        {uniqueActivities.map((activity) => {
                             const Icon = getActivityIcon(activity.name);
                             const styles = getActivityStyles(activity.name);
                             const isSelected = selectedType === activity.name && !isCustom;

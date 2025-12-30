@@ -31,9 +31,25 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## How to Deploy (with GitHub Persistence)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This app uses **GitHub Issues** as a database. To deploy it and keep it working:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1.  **Fork this Repository**  
+    Create your own copy of this repo on GitHub.
+
+2.  **Generate a Personal Access Token**  
+    - Go to GitHub -> Settings -> Developer Settings -> Personal Access Tokens (Classic).
+    - Generate a new token with `repo` scope (full control of private repositories).
+    - Copy the token.
+
+3.  **Deploy on Vercel**  
+    - Import your forked repository on Vercel.
+    - Add the following **Environment Variables**:
+      - `NEXT_PUBLIC_GITHUB_TOKEN`: The token you just copied.
+      - `NEXT_PUBLIC_REPO_OWNER`: Your GitHub username.
+      - `NEXT_PUBLIC_REPO_NAME`: The name of your repo (e.g., `fitness-tracker`).
+
+4.  **Done!**  
+    Vercel will build and deploy the site. All your workouts will be saved as Issues in your GitHub repository.
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, Suspense } from 'react';
-import { getGithubConfig, getProfiles, getWorkout } from '@/lib/github';
+import { getGithubConfig, getProfiles, getWorkouts, getWorkout } from '@/lib/github';
 import ClientLogForm from '@/components/LogForm';
 import { Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
@@ -18,15 +18,27 @@ function LogContent() {
         async function fetchData() {
             const config = getGithubConfig();
             if (config) {
-                const profiles = await getProfiles(config);
+                // Parallel fetch for profiles and workouts (to get types)
+                const [profiles, workouts] = await Promise.all([
+                    getProfiles(config),
+                    getWorkouts(config)
+                ]);
+
                 setUsers(profiles.map(p => ({ id: p.id, name: p.name })));
+
+                // Extract unique activity types
+                const seenTypes = new Set<string>();
+                workouts.forEach(w => { if (w.type) seenTypes.add(w.type); });
+                const existingTypes = Array.from(seenTypes);
+
+                // Pass to form
+                setInitialData(prev => ({ ...prev, existingTypes }));
 
                 if (editId) {
                     const workout = await getWorkout(config, Number(editId));
-                    if (workout) setInitialData(workout);
+                    if (workout) setInitialData(prev => ({ ...prev, ...workout }));
                 } else if (dateParam) {
-                    // Pre-fill date for new entry
-                    setInitialData({ date: dateParam });
+                    setInitialData(prev => ({ ...prev, date: dateParam }));
                 }
             }
             setLoading(false);

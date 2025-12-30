@@ -140,7 +140,7 @@ export default function Home() {
             {/* Add Activity Button for Selected Date */}
             <Link
               href={`/log?date=${selectedDate.toISOString().split('T')[0]}`}
-              className="flex items-center gap-1 text-sm text-[var(--primary)] bg-[var(--primary)]/10 px-3 py-1.5 rounded-full hover:bg-[var(--primary)]/20 transition-colors"
+              className="flex items-center gap-1 text-sm text-blue-500 bg-blue-500/10 px-3 py-1.5 rounded-full hover:bg-blue-500/20 transition-colors"
             >
               <Activity size={14} />
               Add activity
@@ -148,53 +148,64 @@ export default function Home() {
           </div>
         </div>
 
-        <ul className="flex flex-col gap-3 pl-4 list-disc marker:text-[var(--muted-foreground)]">
+        <div className="flex flex-col gap-3 pl-2">
           {/* Only show mock Sleep/Steps if Today (logic placeholder) */}
           {isToday && (
             <>
-              <li className="text-[var(--muted-foreground)] pl-2">
-                You slept for <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">___ hours</span> and <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">___ minutes</span> today.
-              </li>
+              <div className="flex items-center gap-3 text-[var(--muted-foreground)]">
+                <div className="p-2 rounded-full bg-purple-500/10 text-purple-400">
+                  <Moon size={18} />
+                </div>
+                <span>
+                  You slept for <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">___ hours</span> and <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">___ minutes</span> today.
+                </span>
+              </div>
 
-              <li className="text-[var(--muted-foreground)] pl-2">
-                You walked <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">xx</span> steps today.
-              </li>
+              <div className="flex items-center gap-3 text-[var(--muted-foreground)]">
+                <div className="p-2 rounded-full bg-orange-500/10 text-orange-400">
+                  <Footprints size={18} />
+                </div>
+                <span>
+                  You walked <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">xx</span> steps today.
+                </span>
+              </div>
             </>
           )}
+        </div>
 
-          {selectedDateWorkouts.map((workout) => {
-            const Icon = getActivityIcon(workout.type);
+        {selectedDateWorkouts.map((workout) => {
+          const Icon = getActivityIcon(workout.type);
 
-            return (
-              <li key={workout.id} className="text-[var(--muted-foreground)] pl-2 flex flex-col gap-1">
-                <div className="flex items-center gap-2">
-                  <span>
-                    <Icon size={16} className="inline mr-2 -mt-1" />
-                    <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
-                  </span>
-                  <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
-                    (Edit)
-                  </Link>
+          return (
+            <li key={workout.id} className="text-[var(--muted-foreground)] pl-2 flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <span>
+                  <Icon size={16} className="inline mr-2 -mt-1" />
+                  <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
+                </span>
+                <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
+                  (Edit)
+                </Link>
+              </div>
+              {workout.notes && (
+                <div className="text-xs text-[var(--muted-foreground)] italic ml-6 opacity-80">
+                  "{workout.notes}"
                 </div>
-                {workout.notes && (
-                  <div className="text-xs text-[var(--muted-foreground)] italic ml-6 opacity-80">
-                    "{workout.notes}"
-                  </div>
-                )}
-              </li>
-            );
-          })}
-
-          {selectedDateWorkouts.length === 0 && !isToday && (
-            <li className="text-[var(--muted-foreground)] opacity-50 italic pl-2 list-none -ml-4">
-              No workouts recorded for this day.
+              )}
             </li>
-          )}
+          );
+        })}
 
-          {/* If today and no workouts, but we showed sleep/steps, maybe don't show "No workouts" generic msg or keep it? Keeping it simple. */}
-        </ul>
-      </section>
+        {selectedDateWorkouts.length === 0 && !isToday && (
+          <li className="text-[var(--muted-foreground)] opacity-50 italic pl-2 list-none -ml-4">
+            No workouts recorded for this day.
+          </li>
+        )}
 
-    </div>
+        {/* If today and no workouts, but we showed sleep/steps, maybe don't show "No workouts" generic msg or keep it? Keeping it simple. */}
+      </ul>
+    </section>
+
+    </div >
   );
 }
