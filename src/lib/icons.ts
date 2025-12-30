@@ -1,0 +1,25 @@
+import { Activity, Footprints, Bike, Dumbbell, Waves, MonitorPlay, Mountain, User } from 'lucide-react';
+
+export function getActivityIcon(type: string) {
+    const lower = type.toLowerCase();
+    if (lower.includes('run') || lower.includes('walk') || lower.includes('hike')) return Footprints;
+    if (lower.includes('cycl') || lower.includes('bike')) return Bike;
+    if (lower.includes('swim') || lower.includes('pool')) return Waves;
+    if (lower.includes('gym') || lower.includes('weight') || lower.includes('lift')) return Dumbbell;
+    if (lower.includes('yoga') || lower.includes('pilates')) return User; // Or a better icon if available
+    if (lower.includes('hiit') || lower.includes('cardio')) return Activity;
+    if (lower.includes('tennis') || lower.includes('sport')) return Activity;
+    return Activity; // Default
+}
+
+// Helper to get color/bg based on type for consistent UI
+export function getActivityStyles(type: string) {
+    const lower = type.toLowerCase();
+    if (lower.includes('run') || lower.includes('walk')) return { color: 'text-blue-400', bg: 'bg-blue-400/10' };
+    if (lower.includes('cycl')) return { color: 'text-green-400', bg: 'bg-green-400/10' };
+    if (lower.includes('gym') || lower.includes('weight')) return { color: 'text-purple-400', bg: 'bg-purple-400/10' };
+    if (lower.includes('swim')) return { color: 'text-cyan-400', bg: 'bg-cyan-400/10' };
+
+    // Default for matching logic
+    return { color: 'text-[var(--primary)]', bg: 'bg-[var(--primary)]/10' };
+}

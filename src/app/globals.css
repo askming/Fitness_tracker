@@ -1,13 +1,47 @@
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@import "tailwindcss";
+
+:root {
+  /* Light Theme Defaults */
+  --background: #ffffff;
+  --foreground: #171717;
+
+  --card: #f5f5f5;
+  --card-foreground: #000000;
+
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+
+  --muted: #e5e5e5;
+  --muted-foreground: #737373;
+
+  --border: #e5e5e5;
+
+  --radius: 12px;
+}
+
+/* Dark Theme Overrides - applied when .dark class is on html/body */
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ffffff;
+  /* Pure white */
+
+  --card: #171717;
+  --card-foreground: #ffffff;
+
+  --primary: #3b82f6;
+  --primary-foreground: #ffffff;
+
+  --muted: #404040;
+  --muted-foreground: #d4d4d4;
+  /* Brighter gray */
+
+  --border: #262626;
 }
 
 html,
@@ -22,13 +56,38 @@ body {
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  padding-bottom: 80px;
+  /* Space for fixed bottom nav */
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
+/* Glassmorphism Utilities */
+.glass {
+  background: rgba(23, 23, 23, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+.gradient-text {
+  background: linear-gradient(to right, #3b82f6, #8b5cf6);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Container for Desktop Mobile Simulation */
+.mobile-container {
+  max-width: 480px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background: var(--background);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 24px;
+}
+
 
 a {
   color: inherit;
