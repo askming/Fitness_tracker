@@ -4,6 +4,7 @@
 import { useEffect, useState } from 'react';
 import TopNav from "@/components/TopNav";
 import Calendar from "@/components/Calendar";
+import Link from "next/link";
 import SummaryChart from "@/components/SummaryChart";
 import { Activity, Footprints, Moon, Loader2 } from "lucide-react";
 import { getGithubConfig, getWorkouts, getProfiles, Workout, UserProfile } from '@/lib/github';
@@ -131,13 +132,13 @@ export default function Home() {
             <h2 className="text-xl font-normal">{displayDate}</h2>
 
             {/* Add Activity Button for Selected Date */}
-            <a
+            <Link
               href={`/log?date=${selectedDate.toISOString().split('T')[0]}`}
               className="flex items-center gap-1 text-sm text-[var(--primary)] bg-[var(--primary)]/10 px-3 py-1.5 rounded-full hover:bg-[var(--primary)]/20 transition-colors"
             >
               <Activity size={14} />
               Add activity
-            </a>
+            </Link>
           </div>
         </div>
 
