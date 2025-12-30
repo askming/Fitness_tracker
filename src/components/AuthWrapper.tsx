@@ -82,7 +82,7 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
                                 required
                                 className="w-full p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-sm"
                             />
-                            <p className="text-[10px] text-[var(--muted-foreground)] mt-1 ml-1">Must have 'repo' scope (Full Control) for private repositories.</p>
+                            <p className="text-[10px] text-[var(--muted-foreground)] mt-1 ml-1">Must have 'repo' scope.</p>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
