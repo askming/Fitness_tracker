@@ -171,40 +171,40 @@ export default function Home() {
               </div>
             </>
           )}
-        </div>
 
-        {selectedDateWorkouts.map((workout) => {
-          const Icon = getActivityIcon(workout.type);
 
-          return (
-            <li key={workout.id} className="text-[var(--muted-foreground)] pl-2 flex flex-col gap-1">
-              <div className="flex items-center gap-2">
-                <span>
-                  <Icon size={16} className="inline mr-2 -mt-1" />
-                  <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
-                </span>
-                <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
-                  (Edit)
-                </Link>
-              </div>
-              {workout.notes && (
-                <div className="text-xs text-[var(--muted-foreground)] italic ml-6 opacity-80">
-                  "{workout.notes}"
+          {selectedDateWorkouts.map((workout) => {
+            const Icon = getActivityIcon(workout.type);
+
+            return (
+              <div key={workout.id} className="text-[var(--muted-foreground)] pl-2 flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span>
+                    <Icon size={16} className="inline mr-2 -mt-1" />
+                    <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
+                  </span>
+                  <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
+                    (Edit)
+                  </Link>
                 </div>
-              )}
-            </li>
-          );
-        })}
+                {workout.notes && (
+                  <div className="text-xs text-[var(--muted-foreground)] italic ml-6 opacity-80">
+                    "{workout.notes}"
+                  </div>
+                )}
+              </div>
+            );
+          })}
 
-        {selectedDateWorkouts.length === 0 && !isToday && (
-          <li className="text-[var(--muted-foreground)] opacity-50 italic pl-2 list-none -ml-4">
-            No workouts recorded for this day.
-          </li>
-        )}
+          {selectedDateWorkouts.length === 0 && !isToday && (
+            <div className="text-[var(--muted-foreground)] opacity-50 italic pl-2 ml-1">
+              No workouts recorded for this day.
+            </div>
+          )}
 
-        {/* If today and no workouts, but we showed sleep/steps, maybe don't show "No workouts" generic msg or keep it? Keeping it simple. */}
-      </ul>
-    </section>
+          {/* If today and no workouts, but we showed sleep/steps, maybe don't show "No workouts" generic msg or keep it? Keeping it simple. */}
+        </div>
+      </section >
 
     </div >
   );
