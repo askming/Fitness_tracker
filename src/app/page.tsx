@@ -34,41 +34,17 @@ export default function Home() {
   const [totalWeeklyHours, setTotalWeeklyHours] = useState(0);
   const [totalWeeklyMins, setTotalWeeklyMins] = useState(0);
 
+
   useEffect(() => {
+    // MOCK DATA FOR SCREENSHOT
     async function fetchData() {
-      const config = getGithubConfig();
-      if (!config) return;
-
-      // Parallel fetch
-      const [workouts, profiles] = await Promise.all([
-        getWorkouts(config),
-        getProfiles(config)
+      setUserName("Yang");
+      setAllWorkouts([
+        { id: 1, type: 'Running', amount: 5, unit: 'km', date: new Date().toISOString(), calories: 350, notes: "Morning run, felt great!" },
+        { id: 2, type: 'Gym', amount: 45, unit: 'mins', date: new Date().toISOString(), calories: 200, notes: "Upper body focus" },
+        { id: 3, type: 'Swimming', amount: 1000, unit: 'm', date: new Date(Date.now() - 86400000).toISOString(), calories: 400 }
       ]);
-
-      if (profiles.length > 0) {
-        setUserName(profiles[0].name);
-      }
-
-      setAllWorkouts(workouts); // Store all for calendar
-      setRecentWorkouts(workouts); // Keep all for filtering logic
-
-      // Calc Weekly Workout Time
-      // Filter last 7 days
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-      const weekWorkouts = workouts.filter(w => new Date(w.date) >= sevenDaysAgo);
-      const totalDuration = weekWorkouts.reduce((acc, curr) => {
-        let mins = 0;
-        if (curr.unit === 'mins') mins = curr.amount || 0;
-        else if (curr.unit === 'hrs') mins = (curr.amount || 0) * 60;
-        else if (!curr.unit && curr.duration) mins = curr.duration; // Legacy
-        return acc + mins;
-      }, 0);
-
-      setTotalWeeklyHours(Math.floor(totalDuration / 60));
-      setTotalWeeklyMins(totalDuration % 60);
-
+      setRecentWorkouts([]); // Not really used in render for finding today's items if we use allWorkouts
       setLoading(false);
     }
     fetchData();
@@ -83,16 +59,10 @@ export default function Home() {
   }
 
   // Mock data for Sleep/Steps since we haven't ported 'DailyStats' to Issues yet
-  const sleepHours = 0;
-  const sleepMins = 0;
-  const avgSleepH = 0;
-  const avgSleepM = 0;
+  const sleepHours = 7;
+  const sleepMins = 30;
   // Steps chart data mock
-  const mockWeeklyStats = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date();
-    d.setDate(d.getDate() - i);
-    return { date: d.toISOString().split('T')[0], steps: 0, sleepMinutes: 0 };
-  });
+  const mockWeeklyStats = [];
 
   // Filter workouts for selected date
   const selectedDateWorkouts = allWorkouts.filter(w =>
@@ -157,7 +127,7 @@ export default function Home() {
                   <Moon size={18} />
                 </div>
                 <span>
-                  You slept for <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">___ hours</span> and <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">___ minutes</span> today.
+                  You slept for <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">7 hours</span> and <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">30 minutes</span> today.
                 </span>
               </div>
 
@@ -166,7 +136,7 @@ export default function Home() {
                   <Footprints size={18} />
                 </div>
                 <span>
-                  You walked <span className="text-white underline decoration-dashed decoration-gray-500 underline-offset-4">xx</span> steps today.
+                  You walked <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">8,542</span> steps today.
                 </span>
               </div>
             </>
@@ -181,7 +151,7 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <span>
                     <Icon size={16} className="inline mr-2 -mt-1" />
-                    <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
+                    <span className="text-[var(--foreground)]">{workout.type}</span> for <span className="text-[var(--foreground)]">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
                   </span>
                   <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
                     (Edit)

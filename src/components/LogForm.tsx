@@ -35,6 +35,8 @@ export default function LogForm({ users, initialData }: { users: User[], initial
     const [customType, setCustomType] = useState(initialData?.type && !uniqueActivities.find(a => a.name === initialData.type) ? initialData.type : '');
     const [isCustom, setIsCustom] = useState(!!(initialData?.type && !uniqueActivities.find(a => a.name === initialData.type)));
     const [notes, setNotes] = useState(initialData?.notes || ''); // Notes state
+    const [customUnit, setCustomUnit] = useState('');
+    const [isCustomUnit, setIsCustomUnit] = useState(false);
 
     // Default to first user if available
     const [selectedUserId, setSelectedUserId] = useState<number | string>(initialData?.userId || (users.length > 0 ? users[0].id : ''));
@@ -63,7 +65,8 @@ export default function LogForm({ users, initialData }: { users: User[], initial
 
         const type = isCustom ? customType : selectedType;
         const amount = Number(formData.get('amount'));
-        const unit = formData.get('unit') as string;
+        const unitValue = formData.get('unit') as string;
+        const unit = unitValue === 'other' ? customUnit : unitValue;
         const calories = Number(formData.get('calories'));
         const date = (formData.get('date') as string) || new Date().toISOString();
         const userId = Number(selectedUserId);
@@ -131,10 +134,10 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                         name="userId"
                         value={selectedUserId}
                         onChange={(e) => setSelectedUserId(e.target.value)}
-                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg appearance-none"
+                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg appearance-none"
                     >
                         {users.map(user => (
-                            <option key={user.id} value={user.id} className="bg-neutral-900 text-white">
+                            <option key={user.id} value={user.id} className="bg-[var(--card)]">
                                 {user.name}
                             </option>
                         ))}
@@ -157,7 +160,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                                     className={clsx(
                                         "flex items-center gap-3 p-4 rounded-xl border transition-all text-left",
                                         isSelected
-                                            ? "border-[var(--primary)] bg-[var(--primary)]/10 text-white"
+                                            ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--foreground)]"
                                             : "border-[var(--card)] bg-[var(--card)] text-[var(--muted-foreground)] hover:bg-[#262626]"
                                     )}
                                 >
@@ -174,7 +177,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                             className={clsx(
                                 "flex items-center gap-3 p-4 rounded-xl border transition-all text-left",
                                 isCustom
-                                    ? "border-[var(--primary)] bg-[var(--primary)]/10 text-white"
+                                    ? "border-[var(--primary)] bg-[var(--primary)]/10 text-[var(--foreground)]"
                                     : "border-[var(--card)] bg-[var(--card)] text-[var(--muted-foreground)] hover:bg-[#262626]"
                             )}
                         >
@@ -193,7 +196,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                                 placeholder="Enter activity name (e.g. Hiking)"
                                 value={customType}
                                 onChange={(e) => setCustomType(e.target.value)}
-                                className="w-full p-4 pl-12 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg animate-in fade-in slide-in-from-top-2"
+                                className="w-full p-4 pl-12 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg animate-in fade-in slide-in-from-top-2"
                             />
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">
                                 <CustomIcon size={20} />
@@ -212,30 +215,43 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                             placeholder="e.g. 5"
                             defaultValue={initialData?.amount ?? initialData?.duration ?? ''}
                             required
-                            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg w-full"
+                            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg w-full"
                         />
                     </div>
                     <div className="flex-1 flex flex-col gap-2">
                         <label className="text-sm font-medium text-[var(--muted-foreground)]">Unit</label>
-                        <input
+                        <select
                             name="unit"
-                            type="text"
-                            placeholder="e.g. km, mins"
                             defaultValue={initialData?.unit ?? 'mins'}
+                            onChange={(e) => setIsCustomUnit(e.target.value === 'other')}
                             required
-                            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg w-full"
-                            list="units-list"
-                        />
-                        <datalist id="units-list">
-                            <option value="mins" />
-                            <option value="hrs" />
-                            <option value="km" />
-                            <option value="miles" />
-                            <option value="steps" />
-                            <option value="reps" />
-                        </datalist>
+                            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg appearance-none"
+                        >
+                            <option value="mins">mins</option>
+                            <option value="hrs">hrs</option>
+                            <option value="km">km</option>
+                            <option value="miles">miles</option>
+                            <option value="steps">steps</option>
+                            <option value="reps">reps</option>
+                            <option value="sets">sets</option>
+                            <option value="other">Other...</option>
+                        </select>
                     </div>
                 </div>
+
+                {isCustomUnit && (
+                    <div className="flex flex-col gap-2">
+                        <label className="text-sm font-medium text-[var(--muted-foreground)]">Custom Unit</label>
+                        <input
+                            type="text"
+                            placeholder="e.g. laps, lbs, etc."
+                            value={customUnit}
+                            onChange={(e) => setCustomUnit(e.target.value)}
+                            required
+                            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg animate-in fade-in slide-in-from-top-2"
+                        />
+                    </div>
+                )}
 
                 <div className="flex flex-col gap-2">
                     <label className="text-sm font-medium text-[var(--muted-foreground)]">Calories (kcal)</label>
@@ -244,7 +260,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                         type="number"
                         placeholder="200"
                         defaultValue={initialData?.calories ?? ''}
-                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg"
+                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg"
                     />
                 </div>
 
@@ -255,7 +271,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                         type="date"
                         required
                         defaultValue={initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
-                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg [color-scheme:dark]"
+                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg"
                     />
                 </div>
 
@@ -267,7 +283,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                         placeholder="How did it feel?"
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
-                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg min-h-[100px] resize-none"
+                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-[var(--foreground)] focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg min-h-[100px] resize-none"
                     />
                 </div>
 
