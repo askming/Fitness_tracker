@@ -68,6 +68,8 @@ export default function AuthWrapper({ children }: { children: React.ReactNode })
                         <h1 className="text-2xl font-bold">Connect GitHub</h1>
                         <p className="text-[var(--muted-foreground)] text-center text-sm">
                             Your data will be stored securely in your own GitHub repository using Issues.
+                            <br />
+                            <span className="text-yellow-500/80">Tip: Use a separate <b>private</b> repository to keep your data hidden.</span>
                         </p>
                     </div>
 
