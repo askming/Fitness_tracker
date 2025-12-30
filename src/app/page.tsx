@@ -166,9 +166,9 @@ export default function Home() {
                     <Icon size={16} className="inline mr-2 -mt-1" />
                     <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.duration}</span> mins
                   </span>
-                  <a href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
+                  <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
                     (Edit)
-                  </a>
+                  </Link>
                 </div>
                 {workout.notes && (
                   <div className="text-xs text-[var(--muted-foreground)] italic ml-6 opacity-80">
