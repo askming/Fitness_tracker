@@ -40,11 +40,16 @@ export default function TopNav() {
                         key={item.href}
                         href={item.href}
                         className={clsx(
-                            "flex items-center justify-center transition-colors duration-200 p-2",
+                            "flex flex-col items-center justify-center transition-colors duration-200 p-2 gap-1", // Changed to flex-col and added gap
                             isActive ? "text-[var(--primary)]" : "text-[var(--muted-foreground)] hover:text-[var(--foreground)]"
                         )}
                     >
                         <Icon size={28} strokeWidth={isActive ? 2.5 : 2} />
+                        {/* Active Dot */}
+                        <div className={clsx(
+                            "w-1.5 h-1.5 rounded-full bg-[var(--primary)] transition-all duration-300",
+                            isActive ? "opacity-100 scale-100" : "opacity-0 scale-0"
+                        )} />
                     </Link>
                 );
             })}
