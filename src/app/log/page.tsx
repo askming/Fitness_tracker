@@ -32,13 +32,13 @@ function LogContent() {
                 const existingTypes = Array.from(seenTypes);
 
                 // Pass to form
-                setInitialData(prev => ({ ...prev, existingTypes }));
+                setInitialData((prev: any) => ({ ...prev, existingTypes }));
 
                 if (editId) {
                     const workout = await getWorkout(config, Number(editId));
-                    if (workout) setInitialData(prev => ({ ...prev, ...workout }));
+                    if (workout) setInitialData((prev: any) => ({ ...prev, ...workout }));
                 } else if (dateParam) {
-                    setInitialData(prev => ({ ...prev, date: dateParam }));
+                    setInitialData((prev: any) => ({ ...prev, date: dateParam }));
                 }
             }
             setLoading(false);
