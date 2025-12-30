@@ -59,7 +59,7 @@ export default function LogForm({ users, initialData }: { users: User[], initial
         const amount = Number(formData.get('amount'));
         const unit = formData.get('unit') as string;
         const calories = Number(formData.get('calories'));
-        const date = initialData?.date || new Date().toISOString();
+        const date = (formData.get('date') as string) || new Date().toISOString();
         const userId = Number(selectedUserId);
         const id = initialData?.id;
         const formNotes = formData.get('notes') as string;
@@ -239,6 +239,17 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                         placeholder="200"
                         defaultValue={initialData?.calories ?? ''}
                         className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg"
+                    />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                    <label className="text-sm font-medium text-[var(--muted-foreground)]">Date</label>
+                    <input
+                        name="date"
+                        type="date"
+                        required
+                        defaultValue={initialData?.date ? new Date(initialData.date).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]}
+                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg [color-scheme:dark]"
                     />
                 </div>
 
