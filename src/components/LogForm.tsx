@@ -56,7 +56,8 @@ export default function LogForm({ users, initialData }: { users: User[], initial
         const formData = new FormData(e.currentTarget);
 
         const type = isCustom ? customType : selectedType;
-        const duration = Number(formData.get('duration'));
+        const amount = Number(formData.get('amount'));
+        const unit = formData.get('unit') as string;
         const calories = Number(formData.get('calories'));
         const date = initialData?.date || new Date().toISOString();
         const userId = Number(selectedUserId);
@@ -79,7 +80,9 @@ export default function LogForm({ users, initialData }: { users: User[], initial
         if (config) {
             await saveWorkout(config, {
                 type,
-                duration,
+                amount,
+                unit,
+                duration: (unit === 'mins' ? amount : (unit === 'hrs' ? amount * 60 : undefined)), // Back-compat for heatmap/stats if time-based
                 calories,
                 date,
                 userId,
@@ -193,16 +196,39 @@ export default function LogForm({ users, initialData }: { users: User[], initial
                     )}
                 </div>
 
-                <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium text-[var(--muted-foreground)]">Duration (minutes)</label>
-                    <input
-                        name="duration"
-                        type="number"
-                        placeholder="30"
-                        defaultValue={initialData?.duration ?? ''}
-                        required
-                        className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg"
-                    />
+                <div className="flex gap-4">
+                    <div className="flex-1 flex flex-col gap-2">
+                        <label className="text-sm font-medium text-[var(--muted-foreground)]">Amount</label>
+                        <input
+                            name="amount"
+                            type="number"
+                            step="0.01"
+                            placeholder="e.g. 5"
+                            defaultValue={initialData?.amount ?? initialData?.duration ?? ''}
+                            required
+                            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg w-full"
+                        />
+                    </div>
+                    <div className="flex-1 flex flex-col gap-2">
+                        <label className="text-sm font-medium text-[var(--muted-foreground)]">Unit</label>
+                        <input
+                            name="unit"
+                            type="text"
+                            placeholder="e.g. km, mins"
+                            defaultValue={initialData?.unit ?? 'mins'}
+                            required
+                            className="p-4 rounded-xl bg-[var(--card)] border border-[var(--border)] text-white focus:outline-none focus:ring-2 focus:ring-[var(--primary)] text-lg w-full"
+                            list="units-list"
+                        />
+                        <datalist id="units-list">
+                            <option value="mins" />
+                            <option value="hrs" />
+                            <option value="km" />
+                            <option value="miles" />
+                            <option value="steps" />
+                            <option value="reps" />
+                        </datalist>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-2">

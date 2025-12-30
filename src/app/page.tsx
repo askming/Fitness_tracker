@@ -58,7 +58,13 @@ export default function Home() {
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
       const weekWorkouts = workouts.filter(w => new Date(w.date) >= sevenDaysAgo);
-      const totalDuration = weekWorkouts.reduce((acc, curr) => acc + (curr.duration || 0), 0);
+      const totalDuration = weekWorkouts.reduce((acc, curr) => {
+        let mins = 0;
+        if (curr.unit === 'mins') mins = curr.amount || 0;
+        else if (curr.unit === 'hrs') mins = (curr.amount || 0) * 60;
+        else if (!curr.unit && curr.duration) mins = curr.duration; // Legacy
+        return acc + mins;
+      }, 0);
 
       setTotalWeeklyHours(Math.floor(totalDuration / 60));
       setTotalWeeklyMins(totalDuration % 60);
@@ -164,7 +170,7 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <span>
                     <Icon size={16} className="inline mr-2 -mt-1" />
-                    <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.duration}</span> mins
+                    <span className="text-white">{workout.type}</span> for <span className="text-white">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
                   </span>
                   <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
                     (Edit)

@@ -11,7 +11,9 @@ export type GithubConfig = {
 export type Workout = {
     id: number; // Issue Number
     type: string;
-    duration: number;
+    duration?: number; // Kept for backward compatibility
+    amount?: number;
+    unit?: string;
     calories: number;
     date: string;
     userId?: number;
