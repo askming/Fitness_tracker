@@ -36,16 +36,28 @@ export default function Home() {
 
 
   useEffect(() => {
-    // MOCK DATA FOR SCREENSHOT
     async function fetchData() {
-      setUserName("Yang");
-      setAllWorkouts([
-        { id: 1, type: 'Running', amount: 5, unit: 'km', date: new Date().toISOString(), calories: 350, notes: "Morning run, felt great!" },
-        { id: 2, type: 'Gym', amount: 45, unit: 'mins', date: new Date().toISOString(), calories: 200, notes: "Upper body focus" },
-        { id: 3, type: 'Swimming', amount: 1000, unit: 'm', date: new Date(Date.now() - 86400000).toISOString(), calories: 400 }
-      ]);
-      setRecentWorkouts([]); // Not really used in render for finding today's items if we use allWorkouts
-      setLoading(false);
+      const config = getGithubConfig();
+      if (!config) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch workouts from GitHub
+        const workouts = await getWorkouts(config);
+        setAllWorkouts(workouts);
+
+        // Fetch user profile from GitHub
+        const profiles = await getProfiles(config);
+        if (profiles.length > 0) {
+          setUserName(profiles[0].name);
+        }
+      } catch (error) {
+        console.error('Error fetching data from GitHub:', error);
+      } finally {
+        setLoading(false);
+      }
     }
     fetchData();
   }, []);
