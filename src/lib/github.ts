@@ -181,23 +181,13 @@ export async function getDailyStats(config: GithubConfig): Promise<DailyStat[]> 
         per_page: 100,
     });
 
-    console.log('getDailyStats - Raw issues fetched:', data.length);
-    console.log('getDailyStats - Raw data:', data);
-
     return data.map((issue: any) => {
         try {
             const content = JSON.parse(issue.body || '{}');
-            console.log('getDailyStats - Parsed content:', content);
             // Check for _type === 'daily-stats'
-            if (content._type !== 'daily-stats') {
-                console.log('getDailyStats - Skipping issue, _type is:', content._type);
-                return null;
-            }
-            const result = { ...content, id: issue.number, type: 'daily-stats' };
-            console.log('getDailyStats - Returning stat:', result);
-            return result;
+            if (content._type !== 'daily-stats') return null;
+            return { ...content, id: issue.number, type: 'daily-stats' };
         } catch (e) {
-            console.error('getDailyStats - Parse error:', e);
             return null;
         }
     }).filter(Boolean) as DailyStat[];

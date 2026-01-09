@@ -35,7 +35,6 @@ export default function Home() {
 
         // Fetch daily stats from GitHub
         const dailyStats = await getDailyStats(config);
-        console.log('page.tsx - Daily stats fetched:', dailyStats);
         setAllDailyStats(dailyStats);
 
         // Fetch user profiles from GitHub
@@ -76,15 +75,9 @@ export default function Home() {
       // Parse the date from the stat (format: "Jan 7, 2026 at 8:00 AM")
       // Extract just the date part before "at"
       const datePartOnly = stat.date.includes(' at ') ? stat.date.split(' at ')[0] : stat.date;
-      console.log('getDailyStatsForDate - Raw stat.date:', stat.date, 'Extracted date part:', datePartOnly);
-      
       const statDate = new Date(datePartOnly).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      const matches = statDate === dateStr;
-      console.log('getDailyStatsForDate - Comparing:', statDate, 'vs', dateStr, 'matches:', matches);
-      return matches;
+      return statDate === dateStr;
     });
-
-    console.log('getDailyStatsForDate - Stats found for', dateStr, ':', statsForDate);
 
     // Aggregate multiple records for the same day
     let totalSteps = 0;
@@ -111,13 +104,11 @@ export default function Home() {
       totalSleepMins = totalSleepMins % 60;
     }
 
-    const result = {
+    return {
       steps: totalSteps,
       sleepHours: totalSleepHours,
       sleepMins: totalSleepMins
     };
-    console.log('getDailyStatsForDate - Final result:', result);
-    return result;
   };
 
   const todayStats = getDailyStatsForDate(selectedDate);
@@ -225,12 +216,10 @@ export default function Home() {
 
           {Object.entries(groupedWorkouts).map(([userId, workouts]) => (
             <div key={userId} className="flex flex-col gap-2">
-              {/* User header - only show if there are multiple users */}
-              {Object.keys(groupedWorkouts).length > 1 && (
-                <div className="text-sm font-medium text-[var(--muted-foreground)] mb-2 border-b border-gray-700/30 pb-2">
-                  {getUserName(userId)}
-                </div>
-              )}
+              {/* User header */}
+              <div className="text-sm font-medium text-[var(--muted-foreground)] mb-2 border-b border-gray-700/30 pb-2">
+                {getUserName(userId)}
+              </div>
               
               {/* Workouts for this user */}
               {workouts.map((workout) => {
