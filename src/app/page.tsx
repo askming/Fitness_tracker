@@ -7,7 +7,7 @@ import Calendar from "@/components/Calendar";
 import Link from "next/link";
 import SummaryChart from "@/components/SummaryChart";
 import { Activity, Footprints, Moon, Loader2 } from "lucide-react";
-import { getGithubConfig, getWorkouts, getProfiles, Workout, UserProfile } from '@/lib/github';
+import { getGithubConfig, getWorkouts, getProfiles, getDailyStats, Workout, UserProfile, DailyStat } from '@/lib/github';
 import { getActivityIcon } from '@/lib/icons';
 
 export default function Home() {
@@ -15,24 +15,8 @@ export default function Home() {
   const [userName, setUserName] = useState("User");
   const [allWorkouts, setAllWorkouts] = useState<Workout[]>([]);
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([]);
-  const [weeklyStats, setWeeklyStats] = useState<{ date: string, steps: number, sleepMinutes: number }[]>([]);
-  // Since we don't have DailyStats table anymore, we have to derive "Steps" and "Sleep" from something.
-  // Wait, the user previously had Apple Health sync which pushed to 'dailyStats'. 
-  // If we move to GitHub Issues, we need a way to store Daily Stats as issues too? 
-  // Let's assume we create issues with label 'daily-stat' for now to keep parity?
-  // OR, for the 'Refactor', maybe we just focus on Workouts first?
-  // The plan said "Data Storage: JSON stringified inside Issue Body".
-  // So 'daily-stat' is another issue type. I didn't add it to `github.ts` yet. 
-  // I should add `getDailyStats` to `github.ts` or just reuse generic fetching?
-  // For now, let's just make 'Workouts' work and leave Stats as 0/Empty or I can quickly add a `getDailyStats` helper if I want to be thorough. 
-  // Let's assume 0 for Stats for this iteration to get the "App Shell" working, and I can add Daily Stat syncing later.
-  // Actually, the sketch shows Sleep Sentence. 
-  // I'll update the logic to just use 0s for now to ensure the UI renders, then we can "pollish" the data source.
-
+  const [allDailyStats, setAllDailyStats] = useState<DailyStat[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
-
-  const [totalWeeklyHours, setTotalWeeklyHours] = useState(0);
-  const [totalWeeklyMins, setTotalWeeklyMins] = useState(0);
 
 
   useEffect(() => {
@@ -47,6 +31,10 @@ export default function Home() {
         // Fetch workouts from GitHub
         const workouts = await getWorkouts(config);
         setAllWorkouts(workouts);
+
+        // Fetch daily stats from GitHub
+        const dailyStats = await getDailyStats(config);
+        setAllDailyStats(dailyStats);
 
         // Fetch user profile from GitHub
         const profiles = await getProfiles(config);
@@ -75,6 +63,52 @@ export default function Home() {
   const sleepMins = 30;
   // Steps chart data mock
   const mockWeeklyStats = [];
+
+  // Helper function to parse date from daily stats and get stats for selected date
+  // Handles multiple records per day by aggregating them
+  const getDailyStatsForDate = (date: Date): { steps: number; sleepHours: number; sleepMins: number } => {
+    const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    
+    const statsForDate = allDailyStats.filter(stat => {
+      // Parse the date from the stat (format: "Jan 7, 2026 at 8:00 AM")
+      const statDate = new Date(stat.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      return statDate === dateStr;
+    });
+
+    // Aggregate multiple records for the same day
+    let totalSteps = 0;
+    let totalSleepHours = 0;
+    let totalSleepMins = 0;
+
+    statsForDate.forEach(stat => {
+      if (stat.steps) {
+        totalSteps += parseInt(stat.steps.toString(), 10) || 0;
+      }
+      if (stat.sleep_hours) {
+        const sleepValue = parseFloat(stat.sleep_hours.toString());
+        if (!isNaN(sleepValue)) {
+          // Handle both "7.5" format and "7 hours 30 mins" format
+          totalSleepHours += Math.floor(sleepValue);
+          totalSleepMins += Math.round((sleepValue % 1) * 60);
+        }
+      }
+    });
+
+    // Normalize minutes
+    if (totalSleepMins >= 60) {
+      totalSleepHours += Math.floor(totalSleepMins / 60);
+      totalSleepMins = totalSleepMins % 60;
+    }
+
+    return {
+      steps: totalSteps,
+      sleepHours: totalSleepHours,
+      sleepMins: totalSleepMins
+    };
+  };
+
+  const todayStats = getDailyStatsForDate(selectedDate);
+  const hasStatsForDate = todayStats.steps > 0 || todayStats.sleepHours > 0 || todayStats.sleepMins > 0;
 
   // Filter workouts for selected date
   const selectedDateWorkouts = allWorkouts.filter(w =>
@@ -131,26 +165,30 @@ export default function Home() {
         </div>
 
         <div className="flex flex-col gap-3 pl-2">
-          {/* Only show mock Sleep/Steps if Today (logic placeholder) */}
-          {isToday && (
+          {/* Show Sleep/Steps if we have data for this day */}
+          {hasStatsForDate && (
             <>
-              <div className="flex items-center gap-3 text-[var(--muted-foreground)]">
-                <div className="p-2 rounded-full bg-purple-500/10 text-purple-400">
-                  <Moon size={18} />
+              {todayStats.sleepHours > 0 || todayStats.sleepMins > 0 && (
+                <div className="flex items-center gap-3 text-[var(--muted-foreground)]">
+                  <div className="p-2 rounded-full bg-purple-500/10 text-purple-400">
+                    <Moon size={18} />
+                  </div>
+                  <span>
+                    You slept for <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">{todayStats.sleepHours} hours</span> and <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">{todayStats.sleepMins} minutes</span>.
+                  </span>
                 </div>
-                <span>
-                  You slept for <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">7 hours</span> and <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">30 minutes</span> today.
-                </span>
-              </div>
+              )}
 
-              <div className="flex items-center gap-3 text-[var(--muted-foreground)]">
-                <div className="p-2 rounded-full bg-orange-500/10 text-orange-400">
-                  <Footprints size={18} />
+              {todayStats.steps > 0 && (
+                <div className="flex items-center gap-3 text-[var(--muted-foreground)]">
+                  <div className="p-2 rounded-full bg-orange-500/10 text-orange-400">
+                    <Footprints size={18} />
+                  </div>
+                  <span>
+                    You walked <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">{todayStats.steps.toLocaleString()}</span> steps.
+                  </span>
                 </div>
-                <span>
-                  You walked <span className="text-[var(--foreground)] underline decoration-dashed decoration-gray-500 underline-offset-4">8,542</span> steps today.
-                </span>
-              </div>
+              )}
             </>
           )}
 

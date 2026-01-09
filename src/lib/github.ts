@@ -27,6 +27,16 @@ export type UserProfile = {
     height?: number;
 };
 
+export type DailyStat = {
+    id: number; // Issue Number
+    type: string; // 'daily-stats'
+    steps?: string | number;
+    sleep_hours?: string | number;
+    unit?: string;
+    date: string;
+    userId?: number;
+};
+
 // Keys for LocalStorage
 export const STORAGE_KEY = 'fitness_tracker_gh_config';
 
@@ -160,4 +170,25 @@ export async function deleteIssue(config: GithubConfig, issueNumber: number) {
     await octokit.request(`PATCH /repos/${config.owner}/${config.repo}/issues/${issueNumber}`, {
         state: 'closed'
     });
+}
+
+// 4. Daily Stats
+export async function getDailyStats(config: GithubConfig): Promise<DailyStat[]> {
+    const octokit = getOctokit(config.token);
+    const { data } = await octokit.request(`GET /repos/${config.owner}/${config.repo}/issues`, {
+        state: 'open',
+        labels: 'daily-stats',
+        per_page: 100,
+    });
+
+    return data.map((issue: any) => {
+        try {
+            const content = JSON.parse(issue.body || '{}');
+            // Check for _type === 'daily-stats'
+            if (content._type !== 'daily-stats') return null;
+            return { ...content, id: issue.number, type: 'daily-stats' };
+        } catch (e) {
+            return null;
+        }
+    }).filter(Boolean) as DailyStat[];
 }
