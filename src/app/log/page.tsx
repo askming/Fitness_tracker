@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState } from 'react';
 import { getGithubConfig, getProfiles, getWorkouts, getWorkout } from '@/lib/github';
-import ClientLogForm from '@/components/LogForm';
+import LogForm from '@/components/LogForm';
 import { Loader2 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 
-function LogContent() {
+export default function LogPage() {
     const [loading, setLoading] = useState(true);
     const [users, setUsers] = useState<{ id: number, name: string }[]>([]);
     const [initialData, setInitialData] = useState<any>(null);
@@ -55,14 +55,6 @@ function LogContent() {
     }
 
     return (
-        <ClientLogForm users={users} initialData={initialData} />
-    );
-}
-
-export default function LogPage() {
-    return (
-        <Suspense fallback={<div className="h-screen flex items-center justify-center"><Loader2 className="animate-spin" /></div>}>
-            <LogContent />
-        </Suspense>
+        <LogForm users={users} initialData={initialData} />
     );
 }
