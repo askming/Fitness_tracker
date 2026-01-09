@@ -16,6 +16,7 @@ export default function Home() {
   const [allWorkouts, setAllWorkouts] = useState<Workout[]>([]);
   const [recentWorkouts, setRecentWorkouts] = useState<Workout[]>([]);
   const [allDailyStats, setAllDailyStats] = useState<DailyStat[]>([]);
+  const [allProfiles, setAllProfiles] = useState<(UserProfile & { id: number })[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
 
@@ -36,8 +37,9 @@ export default function Home() {
         const dailyStats = await getDailyStats(config);
         setAllDailyStats(dailyStats);
 
-        // Fetch user profile from GitHub
+        // Fetch user profiles from GitHub
         const profiles = await getProfiles(config);
+        setAllProfiles(profiles);
         if (profiles.length > 0) {
           setUserName(profiles[0].name);
         }
@@ -128,6 +130,13 @@ export default function Home() {
   const isToday = new Date().toDateString() === selectedDate.toDateString();
   const displayDate = isToday ? "Today's activities" : `Activities for ${selectedDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
 
+  // Helper function to get user name from userId
+  const getUserName = (userId: string | number): string => {
+    if (userId === 'default') return 'Unknown';
+    const profile = allProfiles.find(p => p.id === Number(userId));
+    return profile?.name || `User ${userId}`;
+  };
+
   return (
     <div className="flex flex-col gap-8">
 
@@ -208,7 +217,7 @@ export default function Home() {
               {/* User header - only show if there are multiple users */}
               {Object.keys(groupedWorkouts).length > 1 && (
                 <div className="text-sm font-medium text-[var(--muted-foreground)] mb-2 border-b border-gray-700/30 pb-2">
-                  User {userId === 'default' ? '(Unknown)' : userId}
+                  {getUserName(userId)}
                 </div>
               )}
               
