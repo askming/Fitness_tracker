@@ -35,6 +35,7 @@ export default function Home() {
 
         // Fetch daily stats from GitHub
         const dailyStats = await getDailyStats(config);
+        console.log('page.tsx - Daily stats fetched:', dailyStats);
         setAllDailyStats(dailyStats);
 
         // Fetch user profiles from GitHub
@@ -74,8 +75,12 @@ export default function Home() {
     const statsForDate = allDailyStats.filter(stat => {
       // Parse the date from the stat (format: "Jan 7, 2026 at 8:00 AM")
       const statDate = new Date(stat.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-      return statDate === dateStr;
+      const matches = statDate === dateStr;
+      console.log('getDailyStatsForDate - Comparing:', statDate, 'vs', dateStr, 'matches:', matches);
+      return matches;
     });
+
+    console.log('getDailyStatsForDate - Stats found for', dateStr, ':', statsForDate);
 
     // Aggregate multiple records for the same day
     let totalSteps = 0;
@@ -102,11 +107,13 @@ export default function Home() {
       totalSleepMins = totalSleepMins % 60;
     }
 
-    return {
+    const result = {
       steps: totalSteps,
       sleepHours: totalSleepHours,
       sleepMins: totalSleepMins
     };
+    console.log('getDailyStatsForDate - Final result:', result);
+    return result;
   };
 
   const todayStats = getDailyStatsForDate(selectedDate);
