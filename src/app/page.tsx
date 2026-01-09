@@ -74,7 +74,11 @@ export default function Home() {
     
     const statsForDate = allDailyStats.filter(stat => {
       // Parse the date from the stat (format: "Jan 7, 2026 at 8:00 AM")
-      const statDate = new Date(stat.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+      // Extract just the date part before "at"
+      const datePartOnly = stat.date.includes(' at ') ? stat.date.split(' at ')[0] : stat.date;
+      console.log('getDailyStatsForDate - Raw stat.date:', stat.date, 'Extracted date part:', datePartOnly);
+      
+      const statDate = new Date(datePartOnly).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       const matches = statDate === dateStr;
       console.log('getDailyStatsForDate - Comparing:', statDate, 'vs', dateStr, 'matches:', matches);
       return matches;
@@ -174,7 +178,7 @@ export default function Home() {
       <section className="flex flex-col gap-4">
         <div>
           <p className="text-sm font-medium text-[var(--muted-foreground)] mb-1 font-serif">
-            Welcome back, {userName}
+            Welcome back
           </p>
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-normal">{displayDate}</h2>
