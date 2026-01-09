@@ -12,14 +12,22 @@ export function getActivityIcon(type: string) {
     return Activity; // Default
 }
 
-// Helper to get color/bg based on type for consistent UI
-export function getActivityStyles(type: string) {
+// Helper to get default unit based on activity type
+export function getActivityUnit(type: string): string {
     const lower = type.toLowerCase();
-    if (lower.includes('run') || lower.includes('walk')) return { color: 'text-blue-400', bg: 'bg-blue-400/10' };
-    if (lower.includes('cycl')) return { color: 'text-green-400', bg: 'bg-green-400/10' };
-    if (lower.includes('gym') || lower.includes('weight')) return { color: 'text-purple-400', bg: 'bg-purple-400/10' };
-    if (lower.includes('swim')) return { color: 'text-cyan-400', bg: 'bg-cyan-400/10' };
-
-    // Default for matching logic
-    return { color: 'text-[var(--primary)]', bg: 'bg-[var(--primary)]/10' };
+    
+    // Rep/count based activities
+    if (lower.includes('push-up') || lower.includes('pushup') || lower.includes('pull-up') || 
+        lower.includes('pullup') || lower.includes('sit-up') || lower.includes('situp') ||
+        lower.includes('dip') || lower.includes('squat') || lower.includes('crunch')) {
+        return 'reps';
+    }
+    
+    // Distance-based activities
+    if (lower.includes('run') || lower.includes('cycl') || lower.includes('bike') || lower.includes('swim')) {
+        return 'km';
+    }
+    
+    // Default to minutes for most other activities (yoga, gym, cardio, etc.)
+    return 'mins';
 }

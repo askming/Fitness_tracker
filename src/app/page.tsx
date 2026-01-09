@@ -8,7 +8,7 @@ import Link from "next/link";
 import SummaryChart from "@/components/SummaryChart";
 import { Activity, Footprints, Moon, Loader2 } from "lucide-react";
 import { getGithubConfig, getWorkouts, getProfiles, getDailyStats, Workout, UserProfile, DailyStat } from '@/lib/github';
-import { getActivityIcon } from '@/lib/icons';
+import { getActivityIcon, getActivityUnit } from '@/lib/icons';
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -224,13 +224,14 @@ export default function Home() {
               {/* Workouts for this user */}
               {workouts.map((workout) => {
                 const Icon = getActivityIcon(workout.type);
+                const displayUnit = workout.unit || getActivityUnit(workout.type);
 
                 return (
                   <div key={workout.id} className="text-[var(--muted-foreground)] pl-2 flex flex-col gap-1">
                     <div className="flex items-center gap-2">
                       <span>
                         <Icon size={16} className="inline mr-2 -mt-1" />
-                        <span className="text-[var(--foreground)]">{workout.type}</span> for <span className="text-[var(--foreground)]">{workout.amount ?? workout.duration}</span> {workout.unit ?? 'mins'}
+                        <span className="text-[var(--foreground)]">{workout.type}</span> for <span className="text-[var(--foreground)]">{workout.amount ?? workout.duration}</span> {displayUnit}
                       </span>
                       <Link href={`/log?editId=${workout.id}`} className="ml-2 text-xs text-[var(--primary)] hover:underline opacity-50 hover:opacity-100">
                         (Edit)

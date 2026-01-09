@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import TopNav from "@/components/TopNav";
 import { getGithubConfig, getWorkouts, getDailyStats, Workout, DailyStat } from '@/lib/github';
 import { ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
-import { getActivityIcon } from '@/lib/icons';
+import { getActivityIcon, getActivityUnit } from '@/lib/icons';
 
 export default function StatsPage() {
   const [loading, setLoading] = useState(true);
@@ -193,6 +193,7 @@ export default function StatsPage() {
               <h3 className="text-sm font-semibold mb-3">Breakdown by Activity</h3>
               {Object.entries(workoutStats).map(([activityType, stats]) => {
                 const Icon = getActivityIcon(activityType);
+                const unit = getActivityUnit(activityType);
                 return (
                   <div key={activityType} className="flex items-center justify-between py-2 text-sm">
                     <div className="flex items-center gap-2">
@@ -202,7 +203,7 @@ export default function StatsPage() {
                     <div className="flex gap-4">
                       <span className="text-[var(--muted-foreground)]">{stats.count} sessions</span>
                       <span className="text-[var(--foreground)] font-semibold min-w-20 text-right">
-                        {stats.totalDuration} mins
+                        {stats.totalDuration} {unit}
                       </span>
                     </div>
                   </div>
